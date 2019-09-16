@@ -29,12 +29,17 @@ public class CsvReader {
                 BufferedReader csvReader = new BufferedReader(new InputStreamReader(new FileInputStream(properties.getProperty("csv_file_path")), "UTF-8"));
 
                 while ((row = csvReader.readLine()) != null) {
-                    String[] data = row.split(",");
+                    try {
+                        String[] data = row.split(",");
 
-                    int id = customerDao.saveCustomer(connection, data[0], data[1], data[2].equals("") ? null : data[2]);
+                        int id = customerDao.saveCustomer(connection, data[0], data[1], data[2].equals("") ? null : data[2]);
 
-                    for (int i = 4; i < data.length; i++) {
-                        contactDao.saveContact(connection, id, data[i]);
+                        for (int i = 4; i < data.length; i++) {
+                            if(!data[i].equals("")){
+                                contactDao.saveContact(connection, id, data[i]);
+                            }
+                        }
+                    } catch (ArrayIndexOutOfBoundsException e) {
                     }
                 }
                 System.out.println("Pomyślnie odczytanu dane z pliku CSV");
